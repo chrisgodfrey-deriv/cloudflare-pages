@@ -1,24 +1,28 @@
 const cookieName = "ab-test-cookie"
-const newHomepagePathName = "/ver2"
+const newHomepagePathName = "/ver2" // b url
+const throttle = 50 // 50% of traffic 
 
 const abTest = async ({ request, next, env }) => {
   const url = new URL(request.url)
   // if homepage
   if (url.pathname === "/") {
-    // if cookie ab-test-cookie=new then change the request to go to /test
-    // if no cookie set, pass x% of traffic and set a cookie value to "current" or "new"
 
     let cookie = request.headers.get("cookie")
-    // is cookie set?
-    if (cookie && cookie.includes(`${cookieName}=new`)) {
-      // pass the request to /test
-      url.pathname = newHomepagePathName
-      return env.ASSETS.fetch(url)
+    // is cookie set and is new cohort?
+    if (cookie) {
+      if(cookie.includes(`${cookieName}=new`)) {
+        // pass the request to /test
+        url.pathname = newHomepagePathName
+        return env.ASSETS.fetch(url)
+      } else {
+        return env.ASSETS.fetch(url)
+      }
     } else {
       const percentage = Math.floor(Math.random() * 100)
       let version = "current" // default version
-      // change pathname and version name for 50% of traffic 
-      if (percentage < 50) {
+      
+      // change pathname and version name for 
+      if (percentage < throttle) {
         url.pathname = newHomepagePathName
         version = "new"
       }
