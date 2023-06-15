@@ -1,5 +1,5 @@
 const cookieName = "ab-test-cookie"
-const newHomepagePathName = "index2.html"
+const newHomepagePathName = "/ver2"
 
 const abTest = async ({ request, next, env }) => {
   const url = new URL(request.url)
